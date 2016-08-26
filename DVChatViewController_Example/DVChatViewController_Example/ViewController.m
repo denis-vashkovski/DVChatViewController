@@ -8,21 +8,8 @@
 
 #import "ViewController.h"
 
-#pragma mark -
-#pragma mark DVMessageObject
-@interface DVMessageObject : NSObject
-+ (instancetype)messageWithText:(NSString *)text currentUserOwner:(BOOL)currentUserOwner;
-@property (nonatomic, strong) NSString *text;
-@property (nonatomic) BOOL isCurrentUserOwner;
-@end
-@implementation DVMessageObject
-+ (instancetype)messageWithText:(NSString *)text currentUserOwner:(BOOL)currentUserOwner {
-    DVMessageObject *message = [DVMessageObject new];
-    [message setText:text];
-    [message setIsCurrentUserOwner:currentUserOwner];
-    return message;
-}
-@end
+#import "DVMessageObject.h"
+#import "DVMessageView.h"
 
 #pragma mark -
 #pragma mark ViewController
@@ -36,9 +23,12 @@
 
 - (NSArray<DVMessageObject *> *)messages {
     if (!_messages) {
-        _messages = @[ [DVMessageObject messageWithText:@"Test1" currentUserOwner:YES],
-                       [DVMessageObject messageWithText:@"Test2" currentUserOwner:NO],
-                       [DVMessageObject messageWithText:@"Test3" currentUserOwner:YES] ];
+        _messages = @[ [DVMessageObject messageWithText:@"Test1" userName:@"User1" currentUserOwner:YES],
+                       [DVMessageObject messageWithText:@"Test2" userName:@"User2" currentUserOwner:NO],
+                       [DVMessageObject messageWithText:@"Test3" userName:@"User1" currentUserOwner:YES],
+                       [DVMessageObject messageWithText:@"Test4" userName:@"User2" currentUserOwner:NO],
+                       [DVMessageObject messageWithText:@"Test5" userName:@"User1" currentUserOwner:YES],
+                       [DVMessageObject messageWithText:@"Test6" userName:@"User2" currentUserOwner:NO] ];
     }
     return _messages;
 }
@@ -46,7 +36,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UIButton *buttonSend = [[UIButton alloc] initWithFrame:CGRectMake(.0, .0, 50., 44.)];
+    [self.navigationItem setTitle:@"Chat"];
+    
+    UIButton *buttonSend = [[UIButton alloc] initWithFrame:CGRectMake(.0, .0, 50., 36.)];
     [buttonSend setTitle:@"Send" forState:UIControlStateNormal];
     [buttonSend setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [buttonSend addTarget:self action:@selector(onButtonSendTouch) forControlEvents:UIControlEventTouchUpInside];
@@ -68,7 +60,6 @@
     [self.dv_textViewToolbar.dv_textView setDVPlaceholder:[[NSAttributedString alloc] initWithString:@"New message"
                                                                                           attributes:@{ NSForegroundColorAttributeName: [UIColor lightGrayColor],
                                                                                                         NSFontAttributeName: [UIFont systemFontOfSize:17.] }]];
-    
 }
 
 #pragma mark DVChatViewControllerDataSource
@@ -86,7 +77,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 40.;
+    return 20.;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
@@ -105,28 +96,27 @@
     return footerView;
 }
 
-#define MESSAGE_TEXT_FONT [UIFont systemFontOfSize:16.]
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [self dv_heightString:self.messages[indexPath.row].text
-                            font:MESSAGE_TEXT_FONT
-                        andWidth:CGRectGetWidth(tableView.frame)] + 20.;
+    return [DVMessageView viewHeightForMessage:self.messages[indexPath.row]] + 20.;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    DVMessageObject *message = self.messages[indexPath.row];
-    
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Message Cell ID" forIndexPath:indexPath];
-    [cell.textLabel setText:message.text];
-    [cell.textLabel setFont:MESSAGE_TEXT_FONT];
-    [cell.textLabel setTextAlignment:(message.isCurrentUserOwner ? NSTextAlignmentRight: NSTextAlignmentLeft)];
+    
+    DVMessageView *messageView = (DVMessageView *)[cell viewWithTag:MESSAGE_VIEW_TAG];
+    [messageView setMessage:self.messages[indexPath.row]];
     
     return cell;
 }
 
 #pragma mark Actions
 - (void)onButtonSendTouch {
+    if (!self.dv_textViewToolbar.dv_textView.text || (self.dv_textViewToolbar.dv_textView.text.length == 0)) {
+        return;
+    }
+    
     NSMutableArray *messages = self.messages.mutableCopy;
-    [messages addObject:[DVMessageObject messageWithText:self.dv_textViewToolbar.dv_textView.text currentUserOwner:YES]];
+    [messages addObject:[DVMessageObject messageWithText:self.dv_textViewToolbar.dv_textView.text userName:@"User1" currentUserOwner:YES]];
     self.messages = [NSArray arrayWithArray:messages];
     
     NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:(self.messages.count - 1) inSection:0];
@@ -134,16 +124,6 @@
     
     [self dv_scrollToBottomAnimated:YES];
     [self.dv_textViewToolbar.dv_textView setText:nil];
-}
-
-#pragma mark Utils
-- (CGFloat)dv_heightString:(NSString *)string font:(UIFont *)font andWidth:(CGFloat)width {
-    return ((string && (string.length > 0))
-            ? [string boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
-                                   options:NSStringDrawingUsesLineFragmentOrigin
-                                attributes:@{ NSFontAttributeName: font }
-                                   context:nil].size.height
-            : .0);
 }
 
 @end

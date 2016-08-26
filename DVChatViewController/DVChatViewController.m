@@ -8,8 +8,6 @@
 
 #import "DVChatViewController.h"
 
-#define SCREEN_HEIGHT [ [ UIScreen mainScreen ] bounds ].size.height
-
 @interface DVChatViewController ()
 @property (nonatomic, strong) NSLayoutConstraint *constraintToolbarBottom;
 @end
@@ -105,7 +103,7 @@
     CGRect keyboardEndFrame = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     if (CGRectIsNull(keyboardEndFrame)) return;
     
-    [self.constraintToolbarBottom setConstant:(SCREEN_HEIGHT - CGRectGetMinY(keyboardEndFrame))];
+    [self.constraintToolbarBottom setConstant:([UIScreen mainScreen].bounds.size.height - CGRectGetMinY(keyboardEndFrame))];
     
     [UIView animateWithDuration:[userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue]
                           delay:.0
@@ -113,7 +111,9 @@
                      animations:^{
                          [self.view layoutIfNeeded];
                      }
-                     completion:nil];
+                     completion:^(BOOL finished) {
+                         [self dv_scrollToBottomAnimated:YES];
+                     }];
 }
 
 - (void)preferredContentSizeChanged:(NSNotification *)notification {
@@ -162,10 +162,8 @@
 - (void)dv_scrollTextViewToBottom:(UITextView *)textView {
     NSRange range = NSMakeRange(textView.text.length, 0);
     [textView scrollRangeToVisible:range];
-    
     [textView setScrollEnabled:NO];
     [textView setScrollEnabled:YES];
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         textView.selectedRange = range;
     });

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		419020F51D7022630063B074 /* DVTextViewToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 419020F41D7022630063B074 /* DVTextViewToolbar.m */; };
+		419020FA1D70553A0063B074 /* DVMessageObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 419020F91D70553A0063B074 /* DVMessageObject.m */; };
+		419020FE1D7055800063B074 /* DVMessageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 419020FD1D7055800063B074 /* DVMessageView.m */; };
 		41CDECC01D701DFE00DEE8ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 41CDECBF1D701DFE00DEE8ED /* main.m */; };
 		41CDECC31D701DFE00DEE8ED /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 41CDECC21D701DFE00DEE8ED /* AppDelegate.m */; };
 		41CDECC61D701DFE00DEE8ED /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 41CDECC51D701DFE00DEE8ED /* ViewController.m */; };
@@ -20,6 +22,10 @@
 /* Begin PBXFileReference section */
 		419020F31D7022630063B074 /* DVTextViewToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DVTextViewToolbar.h; path = ../DVChatViewController/DVTextViewToolbar.h; sourceTree = "<group>"; };
 		419020F41D7022630063B074 /* DVTextViewToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DVTextViewToolbar.m; path = ../DVChatViewController/DVTextViewToolbar.m; sourceTree = "<group>"; };
+		419020F81D70553A0063B074 /* DVMessageObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DVMessageObject.h; sourceTree = "<group>"; };
+		419020F91D70553A0063B074 /* DVMessageObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DVMessageObject.m; sourceTree = "<group>"; };
+		419020FC1D7055800063B074 /* DVMessageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DVMessageView.h; sourceTree = "<group>"; };
+		419020FD1D7055800063B074 /* DVMessageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DVMessageView.m; sourceTree = "<group>"; };
 		41CDECBB1D701DFE00DEE8ED /* DVChatViewController_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DVChatViewController_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		41CDECBF1D701DFE00DEE8ED /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		41CDECC11D701DFE00DEE8ED /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -45,6 +51,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		419020F61D7055230063B074 /* AppDelegate */ = {
+			isa = PBXGroup;
+			children = (
+				41CDECC11D701DFE00DEE8ED /* AppDelegate.h */,
+				41CDECC21D701DFE00DEE8ED /* AppDelegate.m */,
+			);
+			name = AppDelegate;
+			sourceTree = "<group>";
+		};
+		419020F71D7055280063B074 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				419020FB1D70553F0063B074 /* Helpers */,
+				41CDECC41D701DFE00DEE8ED /* ViewController.h */,
+				41CDECC51D701DFE00DEE8ED /* ViewController.m */,
+			);
+			name = Chat;
+			sourceTree = "<group>";
+		};
+		419020FB1D70553F0063B074 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				419020F81D70553A0063B074 /* DVMessageObject.h */,
+				419020F91D70553A0063B074 /* DVMessageObject.m */,
+				419020FC1D7055800063B074 /* DVMessageView.h */,
+				419020FD1D7055800063B074 /* DVMessageView.m */,
+			);
+			name = Helpers;
+			sourceTree = "<group>";
+		};
 		41CDECB21D701DFE00DEE8ED = {
 			isa = PBXGroup;
 			children = (
@@ -65,10 +101,8 @@
 		41CDECBD1D701DFE00DEE8ED /* DVChatViewController_Example */ = {
 			isa = PBXGroup;
 			children = (
-				41CDECC11D701DFE00DEE8ED /* AppDelegate.h */,
-				41CDECC21D701DFE00DEE8ED /* AppDelegate.m */,
-				41CDECC41D701DFE00DEE8ED /* ViewController.h */,
-				41CDECC51D701DFE00DEE8ED /* ViewController.m */,
+				419020F61D7055230063B074 /* AppDelegate */,
+				419020F71D7055280063B074 /* Chat */,
 				41CDECC71D701DFE00DEE8ED /* Main.storyboard */,
 				41CDECCA1D701DFE00DEE8ED /* Assets.xcassets */,
 				41CDECCC1D701DFE00DEE8ED /* LaunchScreen.storyboard */,
@@ -171,6 +205,8 @@
 				419020F51D7022630063B074 /* DVTextViewToolbar.m in Sources */,
 				41CDECC31D701DFE00DEE8ED /* AppDelegate.m in Sources */,
 				41CDECD71D701E3200DEE8ED /* DVChatViewController.m in Sources */,
+				419020FA1D70553A0063B074 /* DVMessageObject.m in Sources */,
+				419020FE1D7055800063B074 /* DVMessageView.m in Sources */,
 				41CDECC01D701DFE00DEE8ED /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

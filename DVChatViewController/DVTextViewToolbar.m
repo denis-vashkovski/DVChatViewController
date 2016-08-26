@@ -8,10 +8,10 @@
 
 #import "DVTextViewToolbar.h"
 
-#define SCREEN_WIDTH [ [ UIScreen mainScreen ] bounds ].size.width
-
 #define MIN_HEIGHT_TOOLBAR_DEFAULT 44.f
+#define MAX_HEIGHT_TOOLBAR_DEFAULT 150.f
 #define TEXT_VIEW_INSETS_VERTICAL_DEFAULT 4.f
+#define TEXT_VIEW_PLACEHOLDER_LEFT_PADDING_DEFAULT 7.
 
 #pragma mark -
 #pragma mark DVTextView
@@ -22,20 +22,27 @@
 @implementation DVTextView{
     NSLayoutConstraint *_heightConstraint;
 }
-#pragma mark Initialization
-- (void)dv_configureTextView {
-    self.dv_minHeight = MAX(MIN_HEIGHT_TOOLBAR_DEFAULT - TEXT_VIEW_INSETS_VERTICAL_DEFAULT * 2, self.dv_minHeight);
-    self.dv_maxHeight = MAX(self.dv_maxHeight, self.dv_minHeight);
+
+- (void)setDVMinHeight:(NSUInteger)dv_minHeight {
+    _dv_minHeight = dv_minHeight;
     
-    [self setTranslatesAutoresizingMaskIntoConstraints:NO];
+    if (_heightConstraint) {
+        [self removeConstraint:_heightConstraint];
+    }
+    
     _heightConstraint = [NSLayoutConstraint constraintWithItem:self
                                                      attribute:NSLayoutAttributeHeight
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:nil
                                                      attribute:0
                                                     multiplier:0
-                                                      constant:self.dv_minHeight];
+                                                      constant:_dv_minHeight];
     [self addConstraint:_heightConstraint];
+}
+
+#pragma mark Initialization
+- (void)dv_configureTextView {
+    [self setTranslatesAutoresizingMaskIntoConstraints:NO];
     
     CGFloat cornerRadius = 6.;
     
@@ -134,8 +141,10 @@
 - (void)drawRect:(CGRect)rect {
     [super drawRect:rect];
     
-    if ((!self.text || (self.text.length == 0)) && self.dv_placeholder) {
-        [self.dv_placeholder drawInRect:CGRectInset(rect, 7., 5.)];
+    if ((!self.text || (self.text.length == 0)) && self.dv_placeholder && (self.dv_placeholder.length != 0)) {
+        [self.dv_placeholder drawInRect:CGRectInset(rect,
+                                                    TEXT_VIEW_PLACEHOLDER_LEFT_PADDING_DEFAULT,
+                                                    ceilf((CGRectGetHeight(self.frame) - (self.font.capHeight + ABS(self.font.descender) + 7.)) / 2.))];
     }
 }
 
@@ -178,15 +187,12 @@
 - (void)dv_configureInputToolbar {
     self.backgroundColor = [UIColor whiteColor];
     
-    self.dv_minHeight = MAX(MIN_HEIGHT_TOOLBAR_DEFAULT, self.dv_minHeight);
-    self.dv_maxHeight = 150.;
-    
     self.dv_contentView = [UIView new];
     [self addSubview:self.dv_contentView];
     
     _dv_textView = [DVTextView new];
-    [_dv_textView setDVMinHeight:self.dv_minHeight];
-    [_dv_textView setDVMaxHeight:self.dv_maxHeight];
+    self.dv_minHeight = MIN_HEIGHT_TOOLBAR_DEFAULT;
+    self.dv_maxHeight = MAX_HEIGHT_TOOLBAR_DEFAULT;
     [self.dv_contentView addSubview:_dv_textView];
     
     [self.dv_contentView setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -204,13 +210,13 @@
 - (void)setDVMinHeight:(NSUInteger)dv_minHeight {
     _dv_minHeight = dv_minHeight;
     
-#warning TODO add update
+    [_dv_textView setDVMinHeight:(self.dv_minHeight - TEXT_VIEW_INSETS_VERTICAL_DEFAULT * 2)];
 }
 
 - (void)setDVMaxHeight:(NSUInteger)dv_maxHeight {
     _dv_maxHeight = dv_maxHeight;
     
-#warning TODO add update
+    [_dv_textView setDVMaxHeight:(self.dv_maxHeight - TEXT_VIEW_INSETS_VERTICAL_DEFAULT * 2)];
 }
 
 - (void)setDVTextViewInsets:(UIEdgeInsets)dv_textViewInsets {
