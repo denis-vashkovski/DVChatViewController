@@ -18,6 +18,7 @@
     return [UITableView new];
 }
 
+#define CONSTRAINT_TOOLBAR_BOTTOM_DEFAULT .0
 - (void)prepareView {
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
@@ -49,13 +50,13 @@
                                                                       metrics:nil
                                                                         views:views]];
     
-    _constraintToolbarBottom = [NSLayoutConstraint constraintWithItem:self.view
-                                                            attribute:NSLayoutAttributeBottom
+    _constraintToolbarBottom = [NSLayoutConstraint constraintWithItem:self.bottomLayoutGuide
+                                                            attribute:NSLayoutAttributeTop
                                                             relatedBy:NSLayoutRelationEqual
                                                                toItem:_dv_textViewToolbar
                                                             attribute:NSLayoutAttributeBottom
                                                            multiplier:1.f
-                                                             constant:.0f];
+                                                             constant:CONSTRAINT_TOOLBAR_BOTTOM_DEFAULT];
     [self.view addConstraint:_constraintToolbarBottom];
 }
 
@@ -103,7 +104,8 @@
     CGRect keyboardEndFrame = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     if (CGRectIsNull(keyboardEndFrame)) return;
     
-    [self.constraintToolbarBottom setConstant:([UIScreen mainScreen].bounds.size.height - CGRectGetMinY(keyboardEndFrame))];
+    [self.constraintToolbarBottom setConstant:MAX(CONSTRAINT_TOOLBAR_BOTTOM_DEFAULT,
+                                                  CGRectGetMaxY(self.dv_textViewToolbar.frame) - CGRectGetMinY(keyboardEndFrame))];
     
     [UIView animateWithDuration:[userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue]
                           delay:.0

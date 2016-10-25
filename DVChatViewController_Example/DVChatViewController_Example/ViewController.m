@@ -28,6 +28,8 @@
                        [DVMessageObject messageWithText:@"Test3" userName:@"User1" currentUserOwner:YES],
                        [DVMessageObject messageWithText:@"Test4" userName:@"User2" currentUserOwner:NO],
                        [DVMessageObject messageWithText:@"Test5" userName:@"User1" currentUserOwner:YES],
+                       [DVMessageObject messageWithText:@"Test6" userName:@"User2" currentUserOwner:NO],
+                       [DVMessageObject messageWithText:@"Test5" userName:@"User1" currentUserOwner:YES],
                        [DVMessageObject messageWithText:@"Test6" userName:@"User2" currentUserOwner:NO] ];
     }
     return _messages;
@@ -124,6 +126,8 @@
     
     [self dv_scrollToBottomAnimated:YES];
     [self.dv_textViewToolbar.dv_textView setText:nil];
+    
+    [self.dv_textViewToolbar.dv_textView resignFirstResponder];
 }
 
 @end
