@@ -62,6 +62,9 @@
     [self.dv_textViewToolbar.dv_textView setDVPlaceholder:[[NSAttributedString alloc] initWithString:@"New message"
                                                                                           attributes:@{ NSForegroundColorAttributeName: [UIColor lightGrayColor],
                                                                                                         NSFontAttributeName: [UIFont systemFontOfSize:17.] }]];
+    [self.dv_textViewToolbar.dv_textView setTextContainerInset:UIEdgeInsetsMake(16., 16., 16., 16.)];
+    
+    [self.dv_textViewToolbar.dv_textView setBackgroundColor:[UIColor redColor]];
 }
 
 #pragma mark DVChatViewControllerDataSource

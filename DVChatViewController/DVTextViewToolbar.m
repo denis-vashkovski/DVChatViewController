@@ -143,7 +143,7 @@
     
     if ((!self.text || (self.text.length == 0)) && self.dv_placeholder && (self.dv_placeholder.length != 0)) {
         [self.dv_placeholder drawInRect:CGRectInset(rect,
-                                                    TEXT_VIEW_PLACEHOLDER_LEFT_PADDING_DEFAULT,
+                                                    (self.textContainerInset.left + TEXT_VIEW_PLACEHOLDER_LEFT_PADDING_DEFAULT),
                                                     ceilf((CGRectGetHeight(self.frame) - (self.font.capHeight + ABS(self.font.descender) + 7.)) / 2.))];
     }
 }
