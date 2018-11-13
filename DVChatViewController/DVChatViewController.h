@@ -13,13 +13,14 @@
 @class DVChatViewController;
 
 @protocol DVChatViewControllerDataSource <NSObject>
-- (UITableView *)dv_tableViewChat:(DVChatViewController *)chatViewController;
+- (UIView *)dv_messagesViewForChatViewController:(DVChatViewController *)chatViewController;
 @end
 
-@interface DVChatViewController : UIViewController<DVChatViewControllerDataSource, UITableViewDataSource, UITableViewDelegate, UITextViewDelegate>
-@property (nonatomic, strong, readonly) UITableView *dv_tableViewChat;
-@property (nonatomic, strong, readonly) DVTextViewToolbar *dv_textViewToolbar;
+@protocol DVChatViewControllerDelegate <NSObject>
+- (void)dv_scrollToBottomChatViewController:(DVChatViewController *)chatViewController animated:(BOOL)animated;
+@end
 
-- (void)dv_scrollToBottomAnimated:(BOOL)animated;
+@interface DVChatViewController : UIViewController <DVChatViewControllerDataSource, DVChatViewControllerDelegate, UITableViewDataSource, UITableViewDelegate, UITextViewDelegate>
+@property (nonatomic, strong, readonly) DVTextViewToolbar *dv_textViewToolbar;
 @end
 

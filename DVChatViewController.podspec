@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name                = "DVChatViewController"
-  s.version             = "0.0.1"
+  s.version             = "0.0.3"
   s.summary             = "UIViewController for simple chat."
   s.homepage            = 'https://github.com/denis-vashkovski/DVChatViewController'
   s.license             = { :type => 'MIT', :file => 'LICENSE' }

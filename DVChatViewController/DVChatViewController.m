@@ -9,35 +9,34 @@
 #import "DVChatViewController.h"
 
 @interface DVChatViewController ()
+@property (nonatomic, strong) UIView *messagesView;
 @property (nonatomic, strong) NSLayoutConstraint *constraintToolbarBottom;
 @end
 
 @implementation DVChatViewController
 
-- (UITableView *)dv_tableViewChat:(DVChatViewController *)chatViewController {
-    return [UITableView new];
+- (UIView *)dv_messagesViewForChatViewController:(DVChatViewController *)chatViewController {
+    return [UIScrollView new];
 }
 
 #define CONSTRAINT_TOOLBAR_BOTTOM_DEFAULT .0
 - (void)prepareView {
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
-    _dv_tableViewChat = [self dv_tableViewChat:self];
-    [_dv_tableViewChat removeConstraints:_dv_tableViewChat.constraints];
-    [_dv_tableViewChat removeFromSuperview];
-    [_dv_tableViewChat setDataSource:self];
-    [_dv_tableViewChat setDelegate:self];
-    [self.view addSubview:_dv_tableViewChat];
+    self.messagesView = [self dv_messagesViewForChatViewController:self];
+    [self.messagesView removeConstraints:self.messagesView.constraints];
+    [self.messagesView removeFromSuperview];
+    [self.view addSubview:self.messagesView];
     
     _dv_textViewToolbar = [DVTextViewToolbar new];
     [_dv_textViewToolbar dv_configureInputToolbar];
     [self.view addSubview:_dv_textViewToolbar];
     
-    [_dv_tableViewChat setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.messagesView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [_dv_textViewToolbar setTranslatesAutoresizingMaskIntoConstraints:NO];
     
-    NSDictionary *views = @{ @"tableView": _dv_tableViewChat, @"toolbar": _dv_textViewToolbar };
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tableView]|"
+    NSDictionary *views = @{ @"messagesView": self.messagesView, @"toolbar": _dv_textViewToolbar };
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[messagesView]|"
                                                                       options:0
                                                                       metrics:nil
                                                                         views:views]];
@@ -45,7 +44,7 @@
                                                                       options:0
                                                                       metrics:nil
                                                                         views:views]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tableView][toolbar]"
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[messagesView][toolbar]"
                                                                       options:0
                                                                       metrics:nil
                                                                         views:views]];
@@ -64,7 +63,6 @@
     [super viewDidLoad];
     
     [self prepareView];
-    [self dv_scrollToBottomAnimated:NO];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -87,6 +85,19 @@
                selector:@selector(dv_textViewDidChange:)
                    name:UITextViewTextDidChangeNotification
                  object:nil];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self.view layoutIfNeeded];
+    
+    for (UIView *view in self.dv_textViewToolbar.subviews) {
+        if ([NSStringFromClass(view.class) isEqualToString:@"_UIToolbarContentView"]) {
+            [view setUserInteractionEnabled:NO];
+        }
+    }
+    
+    [self dv_scrollToBottomChatViewController:self animated:NO];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -112,14 +123,15 @@
                         options:([userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue] << 16)
                      animations:^{
                          [self.view layoutIfNeeded];
+                         [self dv_scrollToBottomChatViewController:self animated:NO];
                      }
                      completion:^(BOOL finished) {
-                         [self dv_scrollToBottomAnimated:YES];
+                         
                      }];
 }
 
 - (void)preferredContentSizeChanged:(NSNotification *)notification {
-    [self.dv_tableViewChat setNeedsLayout];
+    [self.messagesView setNeedsLayout];
 }
 
 #pragma mark - UITableViewDataSource, UITableViewDelegate
@@ -138,25 +150,48 @@
 #pragma mark - Text view delegate
 - (void)dv_textViewDidBeginEditing:(NSNotification *)notification {
     if (notification.object && (notification.object == self.dv_textViewToolbar.dv_textView)) {
-        [self dv_scrollToBottomAnimated:YES];
         [self dv_scrollTextViewToBottom:notification.object];
     }
 }
 
 - (void)dv_textViewDidChange:(NSNotification *)notification {
     if (notification.object && (notification.object == self.dv_textViewToolbar.dv_textView)) {
-        [self dv_scrollToBottomAnimated:YES];
+        [self dv_scrollToBottomChatViewController:self animated:YES];
     }
 }
 
 #pragma mark - Utils
-- (void)dv_scrollToBottomAnimated:(BOOL)animated {
-    if (self.dv_tableViewChat.numberOfSections > 0) {
-        NSUInteger numberOfRowsInSection = [self.dv_tableViewChat numberOfRowsInSection:0];
+- (void)dv_scrollToBottomChatViewController:(DVChatViewController *)chatViewController animated:(BOOL)animated {
+    if ([self.messagesView isKindOfClass:[UICollectionView class]]) {
+        UICollectionView *collectionView = (UICollectionView *)self.messagesView;
+        NSInteger numberOfSections = collectionView.numberOfSections;
+        if (numberOfSections == 0) return;
         
-        if (numberOfRowsInSection > 0) {
-            NSIndexPath *lastCell = [NSIndexPath indexPathForItem:(numberOfRowsInSection - 1) inSection:0];
-            [self.dv_tableViewChat scrollToRowAtIndexPath:lastCell atScrollPosition:UITableViewScrollPositionBottom animated:animated];
+        NSUInteger lastSection = numberOfSections - 1;
+        NSUInteger numberOfItemsInLastSection = [collectionView numberOfItemsInSection:lastSection];
+        
+        if (numberOfItemsInLastSection > 0) {
+            NSIndexPath *lastItem = [NSIndexPath indexPathForItem:(numberOfItemsInLastSection - 1) inSection:lastSection];
+            [collectionView scrollToItemAtIndexPath:lastItem atScrollPosition:UICollectionViewScrollPositionBottom animated:YES];
+        }
+    } else if ([self.messagesView isKindOfClass:[UITableView class]]) {
+        UITableView *tableView = (UITableView *)self.messagesView;
+        NSInteger numberOfSections = tableView.numberOfSections;
+        if (tableView.numberOfSections == 0) return;
+        
+        NSUInteger lastSection = numberOfSections - 1;
+        NSUInteger numberOfRowsInLastSection = [tableView numberOfRowsInSection:lastSection];
+        
+        if (numberOfRowsInLastSection > 0) {
+            NSIndexPath *lastCell = [NSIndexPath indexPathForItem:(numberOfRowsInLastSection - 1) inSection:lastSection];
+            [tableView scrollToRowAtIndexPath:lastCell atScrollPosition:UITableViewScrollPositionBottom animated:animated];
+        }
+    } else if ([self.messagesView isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)self.messagesView;
+        
+        CGFloat bottomOffset = scrollView.contentSize.height - scrollView.bounds.size.height + scrollView.contentInset.bottom;
+        if (bottomOffset >= 0) {
+            [scrollView setContentOffset:CGPointMake(0, bottomOffset) animated:YES];
         }
     }
 }

@@ -38,6 +38,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.tableViewChat.dataSource = self;
+    self.tableViewChat.delegate = self;
+    
     [self.navigationItem setTitle:@"Chat"];
     
     UIButton *buttonSend = [[UIButton alloc] initWithFrame:CGRectMake(.0, .0, 50., 36.)];
@@ -56,20 +59,18 @@
                                                                                     metrics:nil
                                                                                       views:NSDictionaryOfVariableBindings(buttonSend)]];
     
-    [self.dv_tableViewChat setBackgroundColor:[UIColor whiteColor]];
+    [self.tableViewChat setBackgroundColor:[UIColor whiteColor]];
     [self.dv_textViewToolbar setDVDelegate:self];
     [self.dv_textViewToolbar setDVTextViewInsets:UIEdgeInsetsMake(4., 4., 4., CGRectGetWidth(buttonSend.frame) + 8.)];
     [self.dv_textViewToolbar.dv_textView setDVPlaceholder:[[NSAttributedString alloc] initWithString:@"New message"
                                                                                           attributes:@{ NSForegroundColorAttributeName: [UIColor lightGrayColor],
                                                                                                         NSFontAttributeName: [UIFont systemFontOfSize:17.] }]];
     [self.dv_textViewToolbar.dv_textView setTextContainerInset:UIEdgeInsetsMake(16., 16., 16., 16.)];
-    
-    [self.dv_textViewToolbar.dv_textView setBackgroundColor:[UIColor redColor]];
 }
 
 #pragma mark DVChatViewControllerDataSource
-- (UITableView *)dv_tableViewChat:(DVChatViewController *)chatViewController {
-    return _tableViewChat;
+- (UIView *)dv_messagesViewForChatViewController:(DVChatViewController *)chatViewController {
+    return self.tableViewChat;
 }
 
 #pragma mark UITableViewDataSource, UITableViewDelegate
@@ -114,6 +115,10 @@
     return cell;
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self.view endEditing:YES];
+}
+
 #pragma mark Actions
 - (void)onButtonSendTouch {
     if (!self.dv_textViewToolbar.dv_textView.text || (self.dv_textViewToolbar.dv_textView.text.length == 0)) {
@@ -125,9 +130,9 @@
     self.messages = [NSArray arrayWithArray:messages];
     
     NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:(self.messages.count - 1) inSection:0];
-    [self.dv_tableViewChat insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+    [self.tableViewChat insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
     
-    [self dv_scrollToBottomAnimated:YES];
+    [self dv_scrollToBottomChatViewController:self animated:YES];
     [self.dv_textViewToolbar.dv_textView setText:nil];
     
     [self.dv_textViewToolbar.dv_textView resignFirstResponder];
