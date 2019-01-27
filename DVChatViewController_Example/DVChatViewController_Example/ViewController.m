@@ -13,7 +13,7 @@
 
 #pragma mark -
 #pragma mark ViewController
-@interface ViewController ()<DVTextViewToolbarDelegate>
+@interface ViewController ()<DVTextViewToolbarDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableViewChat;
 
 @property (nonatomic, strong) NSArray<DVMessageObject *> *messages;
@@ -50,21 +50,24 @@
     [self.dv_textViewToolbar addSubview:buttonSend];
     
     [buttonSend setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [self.dv_textViewToolbar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[buttonSend(%f)]-4-|", CGRectGetWidth(buttonSend.frame)]
-                                                                                    options:0
-                                                                                    metrics:nil
-                                                                                      views:NSDictionaryOfVariableBindings(buttonSend)]];
-    [self.dv_textViewToolbar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[buttonSend(%f)]-4-|", CGRectGetHeight(buttonSend.frame)]
-                                                                                    options:0
-                                                                                    metrics:nil
-                                                                                      views:NSDictionaryOfVariableBindings(buttonSend)]];
+    [self.dv_textViewToolbar addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[buttonSend(%f)]-4-|", CGRectGetWidth(buttonSend.frame)]
+                                             options:0
+                                             metrics:nil
+                                               views:NSDictionaryOfVariableBindings(buttonSend)]];
+    [self.dv_textViewToolbar addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[buttonSend(%f)]-4-|", CGRectGetHeight(buttonSend.frame)]
+                                             options:0
+                                             metrics:nil
+                                               views:NSDictionaryOfVariableBindings(buttonSend)]];
     
     [self.tableViewChat setBackgroundColor:[UIColor whiteColor]];
     [self.dv_textViewToolbar setDVDelegate:self];
     [self.dv_textViewToolbar setDVTextViewInsets:UIEdgeInsetsMake(4., 4., 4., CGRectGetWidth(buttonSend.frame) + 8.)];
-    [self.dv_textViewToolbar.dv_textView setDVPlaceholder:[[NSAttributedString alloc] initWithString:@"New message"
-                                                                                          attributes:@{ NSForegroundColorAttributeName: [UIColor lightGrayColor],
-                                                                                                        NSFontAttributeName: [UIFont systemFontOfSize:17.] }]];
+    [self.dv_textViewToolbar.dv_textView setDVPlaceholder:
+     [[NSAttributedString alloc] initWithString:@"New message"
+                                     attributes:@{ NSForegroundColorAttributeName: [UIColor lightGrayColor],
+                                                   NSFontAttributeName: [UIFont systemFontOfSize:17.] }]];
     [self.dv_textViewToolbar.dv_textView setTextContainerInset:UIEdgeInsetsMake(16., 16., 16., 16.)];
 }
 

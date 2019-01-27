@@ -15,48 +15,55 @@
 
 @implementation DVChatViewController
 
+- (UIView *)dv_chatViewContainer {
+    return self.view;
+}
+
 - (UIView *)dv_messagesViewForChatViewController:(DVChatViewController *)chatViewController {
     return [UIScrollView new];
 }
 
 #define CONSTRAINT_TOOLBAR_BOTTOM_DEFAULT .0
 - (void)prepareView {
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self.dv_chatViewContainer setBackgroundColor:[UIColor whiteColor]];
     
     self.messagesView = [self dv_messagesViewForChatViewController:self];
     [self.messagesView removeConstraints:self.messagesView.constraints];
     [self.messagesView removeFromSuperview];
-    [self.view addSubview:self.messagesView];
+    [self.dv_chatViewContainer addSubview:self.messagesView];
     
     _dv_textViewToolbar = [DVTextViewToolbar new];
-    [_dv_textViewToolbar dv_configureInputToolbar];
-    [self.view addSubview:_dv_textViewToolbar];
+    [self.dv_textViewToolbar dv_configureInputToolbar];
+    [self.dv_chatViewContainer addSubview:self.dv_textViewToolbar];
     
     [self.messagesView setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [_dv_textViewToolbar setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self.dv_textViewToolbar setTranslatesAutoresizingMaskIntoConstraints:NO];
     
-    NSDictionary *views = @{ @"messagesView": self.messagesView, @"toolbar": _dv_textViewToolbar };
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[messagesView]|"
-                                                                      options:0
-                                                                      metrics:nil
-                                                                        views:views]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[toolbar]|"
-                                                                      options:0
-                                                                      metrics:nil
-                                                                        views:views]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[messagesView][toolbar]"
-                                                                      options:0
-                                                                      metrics:nil
-                                                                        views:views]];
+    NSDictionary *views = @{ @"messagesView": self.messagesView, @"toolbar": self.dv_textViewToolbar };
+    [self.dv_chatViewContainer addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[messagesView]|"
+                                             options:0
+                                             metrics:nil
+                                               views:views]];
+    [self.dv_chatViewContainer addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[toolbar]|"
+                                             options:0
+                                             metrics:nil
+                                               views:views]];
+    [self.dv_chatViewContainer addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[messagesView][toolbar]"
+                                             options:0
+                                             metrics:nil
+                                               views:views]];
     
-    _constraintToolbarBottom = [NSLayoutConstraint constraintWithItem:self.bottomLayoutGuide
-                                                            attribute:NSLayoutAttributeTop
-                                                            relatedBy:NSLayoutRelationEqual
-                                                               toItem:_dv_textViewToolbar
-                                                            attribute:NSLayoutAttributeBottom
-                                                           multiplier:1.f
-                                                             constant:CONSTRAINT_TOOLBAR_BOTTOM_DEFAULT];
-    [self.view addConstraint:_constraintToolbarBottom];
+    self.constraintToolbarBottom = [NSLayoutConstraint constraintWithItem:self.dv_chatViewContainer
+                                                                attribute:NSLayoutAttributeBottom
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.dv_textViewToolbar
+                                                                attribute:NSLayoutAttributeBottom
+                                                               multiplier:1.f
+                                                                 constant:CONSTRAINT_TOOLBAR_BOTTOM_DEFAULT];
+    [self.dv_chatViewContainer addConstraint:self.constraintToolbarBottom];
 }
 
 - (void)viewDidLoad {
@@ -89,7 +96,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self.view layoutIfNeeded];
+    [self.dv_chatViewContainer layoutIfNeeded];
     
     for (UIView *view in self.dv_textViewToolbar.subviews) {
         if ([NSStringFromClass(view.class) isEqualToString:@"_UIToolbarContentView"]) {
@@ -115,14 +122,18 @@
     CGRect keyboardEndFrame = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     if (CGRectIsNull(keyboardEndFrame)) return;
     
+    CGRect textViewToolbarFrameGlobal = [self.dv_chatViewContainer convertRect:self.dv_textViewToolbar.frame
+                                                                        toView:self.view];
+    CGFloat toolbarBottomPadding = (CGRectGetMaxY(textViewToolbarFrameGlobal)
+                                    - CGRectGetMinY(keyboardEndFrame));
     [self.constraintToolbarBottom setConstant:MAX(CONSTRAINT_TOOLBAR_BOTTOM_DEFAULT,
-                                                  CGRectGetMaxY(self.dv_textViewToolbar.frame) - CGRectGetMinY(keyboardEndFrame))];
+                                                  toolbarBottomPadding)];
     
     [UIView animateWithDuration:[userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue]
                           delay:.0
                         options:([userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue] << 16)
                      animations:^{
-                         [self.view layoutIfNeeded];
+                         [self.dv_chatViewContainer layoutIfNeeded];
                          [self dv_scrollToBottomChatViewController:self animated:NO];
                      }
                      completion:^(BOOL finished) {
@@ -132,19 +143,6 @@
 
 - (void)preferredContentSizeChanged:(NSNotification *)notification {
     [self.messagesView setNeedsLayout];
-}
-
-#pragma mark - UITableViewDataSource, UITableViewDelegate
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 0;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 0;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return nil;
 }
 
 #pragma mark - Text view delegate

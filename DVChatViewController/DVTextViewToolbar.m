@@ -8,10 +8,10 @@
 
 #import "DVTextViewToolbar.h"
 
-#define MIN_HEIGHT_TOOLBAR_DEFAULT 44.f
-#define MAX_HEIGHT_TOOLBAR_DEFAULT 150.f
-#define TEXT_VIEW_INSETS_VERTICAL_DEFAULT 4.f
-#define TEXT_VIEW_PLACEHOLDER_LEFT_PADDING_DEFAULT 7.
+CGFloat const DVTextViewToolbarMinHightDefault = 44.f;
+CGFloat const DVTextViewToolbarMaxHightDefault = 150.f;
+CGFloat const DVTextViewVerticalInsetsDefault = 4.f;
+CGFloat const DVTextViewPlaceholderLeftPaddingDefault = 7.f;
 
 #pragma mark -
 #pragma mark DVTextView
@@ -143,7 +143,7 @@
     
     if ((!self.text || (self.text.length == 0)) && self.dv_placeholder && (self.dv_placeholder.length != 0)) {
         [self.dv_placeholder drawInRect:CGRectInset(rect,
-                                                    (self.textContainerInset.left + TEXT_VIEW_PLACEHOLDER_LEFT_PADDING_DEFAULT),
+                                                    (self.textContainerInset.left + DVTextViewPlaceholderLeftPaddingDefault),
                                                     ceilf((CGRectGetHeight(self.frame) - (self.font.capHeight + ABS(self.font.descender) + 7.)) / 2.))];
     }
 }
@@ -191,8 +191,8 @@
     [self addSubview:self.dv_contentView];
     
     _dv_textView = [DVTextView new];
-    self.dv_minHeight = MIN_HEIGHT_TOOLBAR_DEFAULT;
-    self.dv_maxHeight = MAX_HEIGHT_TOOLBAR_DEFAULT;
+    self.dv_minHeight = DVTextViewToolbarMinHightDefault;
+    self.dv_maxHeight = DVTextViewToolbarMaxHightDefault;
     [self.dv_contentView addSubview:_dv_textView];
     
     [self.dv_contentView setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -210,13 +210,13 @@
 - (void)setDVMinHeight:(NSUInteger)dv_minHeight {
     _dv_minHeight = dv_minHeight;
     
-    [_dv_textView setDVMinHeight:(self.dv_minHeight - TEXT_VIEW_INSETS_VERTICAL_DEFAULT * 2)];
+    [_dv_textView setDVMinHeight:(self.dv_minHeight - DVTextViewVerticalInsetsDefault * 2)];
 }
 
 - (void)setDVMaxHeight:(NSUInteger)dv_maxHeight {
     _dv_maxHeight = dv_maxHeight;
     
-    [_dv_textView setDVMaxHeight:(self.dv_maxHeight - TEXT_VIEW_INSETS_VERTICAL_DEFAULT * 2)];
+    [_dv_textView setDVMaxHeight:(self.dv_maxHeight - DVTextViewVerticalInsetsDefault * 2)];
 }
 
 - (void)setDVTextViewInsets:(UIEdgeInsets)dv_textViewInsets {

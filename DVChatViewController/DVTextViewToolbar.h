@@ -8,6 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+extern CGFloat const DVTextViewToolbarMinHightDefault;
+extern CGFloat const DVTextViewToolbarMaxHightDefault;
+extern CGFloat const DVTextViewVerticalInsetsDefault;
+extern CGFloat const DVTextViewPlaceholderLeftPaddingDefault;
+
 @interface DVTextView : UITextView
 @property (nonatomic, copy, setter=setDVPlaceholder:) NSAttributedString *dv_placeholder;
 @end
